@@ -29,9 +29,8 @@ Print the command that will be issued to the remote node over SSH, instead of ru
 ## General Steps
 
 1. Set <code>SIM_ROOT</code> environment variable to point to the root directory of this repository
-2. Set <code>USER</code> and <code>PASSWD_FILE</code> fields in launcher script. <code>PASSWD_FILE</code> is the name of a plain-text file containing the password to be used by SSH for node login. This should be created/kept in the root directory of this repo.
-3. Launch runs with the procedure outlined above. Select suite, design, application(s) and key(s) using script parameters. This sets off simulations of all permutations from those selected. Once a set of parameters is selected, call script replacing <code>**-action**</code> with <code>simulate</code>, <code>parse</code> and <code>stats</code> to complete the full analysis loop.  The statistics reporting done corresponds to the analysis described in our Computer Architecture Letters publication, [A Pre-Silicon Approach to Discovering Microarchitectural Vulnerabilities in Security Critical Applications].
-4. To create CSV files of uarch trace data as input to ML models use <code>scripts/generate_all_tables.sh</code>, passing the design and suite names. Columnar tables for each application,keys will be generated from this pair. The file will be placed under the <code>data</code> directory. An example:
+2. Launch runs with the procedure outlined above. Select suite, design, application(s) and key(s) using script parameters. This sets off simulations of all permutations from those selected. Once a set of parameters is selected, call script replacing <code>**-action**</code> with <code>simulate</code>, <code>parse</code> and <code>stats</code> to complete the full analysis loop.  The statistics reporting done corresponds to the analysis described in our Computer Architecture Letters publication, [A Pre-Silicon Approach to Discovering Microarchitectural Vulnerabilities in Security Critical Applications].
+3. To create CSV files of uarch trace data as input to ML models use <code>scripts/generate_all_tables.sh</code>, passing the design and suite names. Columnar tables for each application,keys will be generated from this pair. The file will be placed under the <code>data</code> directory. An example:
    > <code> ./scripts/generate_all_tables.sh baseline bearssl_synthetic </code>
 
 ### Adding a Test
@@ -52,21 +51,7 @@ To execute tests using a new key, a plain-text file must be created under <code>
 There are other tools available to help with debugging and quickly finding information. The <code>pc_finder.py</code> script will locate the program counter (PC) values which lie on the boundaries of identified security-critical regions (SCRs). It takes SCR function names/labels as input.
 Also, <code>inspect_instructions.py</code> can be helpful in an interactive python session to search the list of instructions fed into the pipeline and view the timestamps for which an instruction occupied various pipeline stages. If no timestamp is found for a particular stage, it means the instruction was speculative and squashed before entering that stage.
 
-## Simulation
 
-### Processor Simulator
-The first stage is to simulate the processor-under-test, executing the selected application. We use the Verilator backend, which is a cycle-accurate C++ model of the hardware.
-
-1. Clone the Chipyard repository from Github: <code>git clone https://github.com/ucb-bar/chipyard.git</code>
-2. Checkout version 1.2.0: <code>git checkout tags/1.2.0</code>
-3. Change the submodule path for the BOOM processor to point to our modified implementation:
-    1. Open .gitmodules from the root directory of Chipyard
-    2. Under <code>[submodule "generators/boom"]</code>, change to <code>url = https://github.com/kristinbarber/riscv-boom.git</code>
-4. Follow instructions for repository initialization from Chipyard documentation
-5. Checkout branch for the baseline design with Microsampler tracing: <code>git checkout baseline</code>
-6. Change to the <code>sims/verilator</code> directory
-    1. Run <code>CONFIG=SmallBoomConfig</code>, this command will generate the simulator executable
-7. Rename simulator binary with extension corresponding to design variant used of the form \*-\<variant\> (e.g., <code>SmallBoomConfig-baseline</code>)
 
 ### Applications
 The <code>apps</code> directory holds respositories for tests to be run with the simulator.
