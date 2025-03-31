@@ -1,0 +1,41 @@
+10-07-2020:
+----------
+
+Flow for producing final difference set:
+
+1) make CONFIG=SmallBoomConfig
+2) mv simulator-chipyard-SmallBoomConfig simulator-chipyard-SmallBoomConfig-printall
+3) time ./simulator-chipyard-SmallBoomConfig-printall +verbose pk /home/barberk/local/bearssl-0.6/build/testcrypto modpow_i31_single > logs/stdout.txt 2> logs/out-all.log
+4) cat logs/out-all.log | spike-dasm > logs/out-all-asm.log
+5) grep -n 0x0000010306 logs/out-all-asm.log 
+       170830709
+6) tail --lines=+170830709 logs/out-all-asm.log > logs/out-all-asm-useronly.log
+
+7) source ~/venv-py3.8.6/bin/activate
+8) time python scripts/parse_timestamps.py logs/out-all-asm-0xaa.log logs/modpow-0xaa.pickle
+    This needs to use the entire log, not only cropped user space execution trace
+    TODO: merge this into parse_state_changes.py, both O3 timestamps and state information printed simultaneously now
+9) time python scripts/parse_state_changes.py logs/out-all-asm-useronly.log logs/state_changes.pickle
+10) time python scripts/stats.py logs/modpow.pickle logs/state_changes.pickle 0xaa > loop_diff-0xaa.txt
+
+11-04-2020:
+----------
+
+Added optimizations, begin_roi signifies to only begin collecting state samples and instructions after encountering the br_i31_modpow() funtion (once we are truly in the ROI)
+and to cease collection once exiting the main() function.
+Also, now collecting ALL state samples once begin_roi==True with no explicit filtering. Unique states within a loop are counted by the stats.py script,
+and subsequently counted across loops/iterations. Following this, there are lists of all unique states in all loop iterations and counts reflecting in how many iterations each state appears.
+We use these counts to determine common state samples shared across loop iterations, where we may set some threshold to determine if a state should be considered common or not.
+For instance, if a particular state sample appears in 85% of all loop iterations, we consider this significant enough that it should be considered a state sample common to all iterations.
+To be clear, this process is performed seperately for iterations where k=0 and k=1.
+Once the list of common state samples has been formed, we then take the difference of these samples across the k=0/k=1 lists.
+This process again is performed for every uarch structure, where what constitues uniqueness, commonality and differences are based on different criterion.
+
+time ./scripts/do_stats.sh 0xaa 0x0000024fcc 0x000001039a 0x000002509a 0x00000305b6 0x00000305d8 bearssl consttime
+time ./scripts/do_stats.sh 0x44 0x0000024fcc 0x000001039a 0x000002509a 0x00000305b6 '0x00000305cc 0x00000305d0' bearssl vuln
+
+09-30-2021:
+-----------
+
+Command to run the statistics collection on a single run of the constant-time algorithm application, with the key 0xaa (repeated for 1024 bits) and setting similarity thresholds as 80% and 20%.
+./scripts/launch_runs.sh -mode stats -appsi consttime -phi .8 -alpha .2 -keysi "0xaa"

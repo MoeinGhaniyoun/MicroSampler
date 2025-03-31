@@ -1,0 +1,9 @@
+python scripts/pc_finder.py apps/bearssl-0.6/microsampler_tests/build/v1.dump br_i31_modpow_v1 br_ccopy_v1
+python scripts/pc_finder.py apps/bearssl-0.6/microsampler_tests/build/v1_warmup.dump br_i31_modpow_v1 br_ccopy_v1 warmup
+python scripts/pc_finder.py apps/bearssl-0.6/microsampler_tests/build/v1_fence.dump br_i31_modpow_v1_fence br_ccopy_v1
+python scripts/pc_finder.py apps/bearssl-0.6/microsampler_tests/build/v2.dump br_i31_modpow_v2 br_ccopy_v2
+python scripts/pc_finder.py apps/bearssl-0.6/microsampler_tests/build/v2_warmup.dump br_i31_modpow_v2 br_ccopy_v2 warmup
+python scripts/pc_finder.py apps/bearssl-0.6/microsampler_tests/build/v2_fence.dump br_i31_modpow_v2_fence br_ccopy_v2
+python scripts/pc_finder.py apps/bearssl-0.6/microsampler_tests/build/v3.dump br_i31_modpow br_ccopy
+python scripts/pc_finder.py apps/bearssl-0.6/microsampler_tests/build/v3_warmup.dump br_i31_modpow br_ccopy warmup
+python scripts/pc_finder.py apps/bearssl-0.6/microsampler_tests/build/v3_fence.dump br_i31_modpow_fence br_ccopy
